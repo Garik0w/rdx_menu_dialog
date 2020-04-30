@@ -1,15 +1,15 @@
 Citizen.CreateThread(function()
-	ESX = nil
+	RDX = nil
 	local Timeouts, OpenedMenus, MenuType = {}, {}, 'dialog'
 
-	while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+	while RDX == nil do
+		TriggerEvent('rdx:getSharedObject', function(obj) RDX = obj end)
 		Citizen.Wait(0)
 	end
 
 	local openMenu = function(namespace, name, data)
 		for i=1, #Timeouts, 1 do
-			ESX.ClearTimeout(Timeouts[i])
+			RDX.ClearTimeout(Timeouts[i])
 		end
 
 		OpenedMenus[namespace .. '_' .. name] = true
@@ -21,7 +21,7 @@ Citizen.CreateThread(function()
 			data = data
 		})
 
-		local timeoutId = ESX.SetTimeout(200, function()
+		local timeoutId = RDX.SetTimeout(200, function()
 			SetNuiFocus(true, true)
 		end)
 
@@ -38,22 +38,22 @@ Citizen.CreateThread(function()
 			data = data
 		})
 
-		if ESX.Table.SizeOf(OpenedMenus) == 0 then
+		if RDX.Table.SizeOf(OpenedMenus) == 0 then
 			SetNuiFocus(false)
 		end
 
 	end
 
-	ESX.UI.Menu.RegisterType(MenuType, openMenu, closeMenu)
+	RDX.UI.Menu.RegisterType(MenuType, openMenu, closeMenu)
 
-	AddEventHandler('esx_menu_dialog:message:menu_submit', function(data)
-		local menu = ESX.UI.Menu.GetOpened(MenuType, data._namespace, data._name)
+	AddEventHandler('rdx_menu_dialog:message:menu_submit', function(data)
+		local menu = RDX.UI.Menu.GetOpened(MenuType, data._namespace, data._name)
 		local cancel = false
 
 		if menu.submit then
 			-- is the submitted data a number?
 			if tonumber(data.value) then
-				data.value = ESX.Math.Round(tonumber(data.value))
+				data.value = RDX.Math.Round(tonumber(data.value))
 
 				-- check for negative value
 				if tonumber(data.value) <= 0 then
@@ -61,27 +61,27 @@ Citizen.CreateThread(function()
 				end
 			end
 
-			data.value = ESX.Math.Trim(data.value)
+			data.value = RDX.Math.Trim(data.value)
 
 			-- don't submit if the value is negative or if it's 0
 			if cancel then
-				ESX.ShowNotification('That input is not allowed!')
+				RDX.ShowNotification('That input is not allowed!')
 			else
 				menu.submit(data, menu)
 			end
 		end
 	end)
 
-	AddEventHandler('esx_menu_dialog:message:menu_cancel', function(data)
-		local menu = ESX.UI.Menu.GetOpened(MenuType, data._namespace, data._name)
+	AddEventHandler('rdx_menu_dialog:message:menu_cancel', function(data)
+		local menu = RDX.UI.Menu.GetOpened(MenuType, data._namespace, data._name)
 
 		if menu.cancel ~= nil then
 			menu.cancel(data, menu)
 		end
 	end)
 
-	AddEventHandler('esx_menu_dialog:message:menu_change', function(data)
-		local menu = ESX.UI.Menu.GetOpened(MenuType, data._namespace, data._name)
+	AddEventHandler('rdx_menu_dialog:message:menu_change', function(data)
+		local menu = RDX.UI.Menu.GetOpened(MenuType, data._namespace, data._name)
 
 		if menu.change ~= nil then
 			menu.change(data, menu)
@@ -92,7 +92,7 @@ Citizen.CreateThread(function()
 		while true do
 			Citizen.Wait(10)
 
-			if ESX.Table.SizeOf(OpenedMenus) > 0 then
+			if RDX.Table.SizeOf(OpenedMenus) > 0 then
 				DisableControlAction(0, 1,   true) -- LookLeftRight
 				DisableControlAction(0, 2,   true) -- LookUpDown
 				DisableControlAction(0, 142, true) -- MeleeAttackAlternate
